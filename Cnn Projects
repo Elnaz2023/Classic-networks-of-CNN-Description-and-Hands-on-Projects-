@@ -1,4 +1,54 @@
-1. LeNet-5 Architecture: LeNet-5 consists of seven layers, including two convolutional layers followed by average pooling layers, and then fully connected layers at the end.
-Sigmoid activation functions were used in the earlier layers, and the final layer employed a softmax activation function for classification. It was specifically designed for 
-recognizing handwritten digits in images.
+import tensorflow as tf
+from tensorflow.keras import layers, models
 
+# Load digit dataset (replace with your dataset loading code)
+# Assuming you have your own dataset similar to MNIST
+# Replace train_images, train_labels, test_images, test_labels with your dataset
+(train_images, train_labels), (test_images, test_labels) = YOUR_OWN_DATASET_LOADING_FUNCTION()
+
+# Preprocess and normalize images
+train_images = train_images.reshape(train_images.shape[0], 28, 28, 1).astype('float32')
+test_images = test_images.reshape(test_images.shape[0], 28, 28, 1).astype('float32')
+train_images /= 255.0
+test_images /= 255.0
+
+# Define LeNet-5 architecture
+def LeNet5():
+    model = models.Sequential()
+    # ... (Same architecture as before)
+    return model
+
+# Create and train LeNet-5 from scratch on the digit dataset
+model = LeNet5()
+model.compile(optimizer='adam', loss='sparse_categorical_crossentropy', metrics=['accuracy'])
+model.fit(train_images, train_labels, epochs=10, batch_size=128, validation_data=(test_images, test_labels))
+
+# Save the trained LeNet-5 model
+model.save('lenet5_trained_on_digits.h5')
+
+# Load the pre-trained model for further use
+loaded_model = tf.keras.models.load_model('lenet5_trained_on_digits.h5')
+
+# Use the pre-trained model for transfer learning on a new dataset
+# Replace new_dataset_images and new_dataset_labels with your new dataset
+new_dataset_images, new_dataset_labels = YOUR_NEW_DATASET_LOADING_FUNCTION()
+new_dataset_images = new_dataset_images.reshape(new_dataset_images.shape[0], 28, 28, 1).astype('float32')
+new_dataset_images /= 255.0
+
+# Freeze the layers of LeNet-5 to prevent retraining
+loaded_model.trainable = False
+
+# Add new classification layers for the new dataset
+# Replace the output layer with the desired number of classes for your new dataset
+new_classification_layers = tf.keras.Sequential([
+    loaded_model,
+    layers.Flatten(),
+    layers.Dense(128, activation='relu'),
+    layers.Dense(NUMBER_OF_CLASSES_NEW_DATASET, activation='softmax')  # Change this to match your new dataset
+])
+
+# Compile the new model for transfer learning
+new_classification_layers.compile(optimizer='adam', loss='sparse_categorical_crossentropy', metrics=['accuracy'])
+
+# Train the new model on the new dataset
+new_classification_layers.fit(new_dataset_images, new_dataset_labels, epochs=5, batch_size=32)
