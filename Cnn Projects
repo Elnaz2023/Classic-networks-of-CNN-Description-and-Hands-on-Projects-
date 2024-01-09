@@ -1,0 +1,4 @@
+1. LeNet-5 Architecture: LeNet-5 consists of seven layers, including two convolutional layers followed by average pooling layers, and then fully connected layers at the end.
+Sigmoid activation functions were used in the earlier layers, and the final layer employed a softmax activation function for classification. It was specifically designed for 
+recognizing handwritten digits in images.
+
